@@ -54,6 +54,10 @@ public:
     EmbeddedGameState step( const std::vector< EmbeddedPlayerCommand > & commands );
     EmbeddedGameState snapshot() const;
 
+    void setPlayMode( PlayMode pm );
+    bool movePlayer( Side side, int unum, double x, double y, double angle_rad );
+    void moveBall( double x, double y, double vx, double vy );
+
 private:
     Stadium M_stadium;
     bool M_initialized = false;

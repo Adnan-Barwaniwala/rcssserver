@@ -155,5 +155,18 @@ PYBIND11_MODULE( _core, module )
               py::arg( "version" ) = 18.0 )
         .def( "start_match", &EmbeddedSimulator::startMatch )
         .def( "step", &EmbeddedSimulator::step, py::arg( "commands" ) )
-        .def( "snapshot", &EmbeddedSimulator::snapshot );
+        .def( "snapshot", &EmbeddedSimulator::snapshot )
+        .def( "set_play_mode", &EmbeddedSimulator::setPlayMode,
+              py::arg( "pm" ) )
+        .def( "move_player", &EmbeddedSimulator::movePlayer,
+              py::arg( "side" ),
+              py::arg( "unum" ),
+              py::arg( "x" ),
+              py::arg( "y" ),
+              py::arg( "angle_rad" ) )
+        .def( "move_ball", &EmbeddedSimulator::moveBall,
+              py::arg( "x" ),
+              py::arg( "y" ),
+              py::arg( "vx" ) = 0.0,
+              py::arg( "vy" ) = 0.0 );
 }
