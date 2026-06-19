@@ -2066,8 +2066,12 @@ Stadium::ballCaught( const Player & catcher )
               } );
 
     if ( playmode() == PM_FreeKick_Left
-         || playmode() == PM_FreeKick_Right )
+         || playmode() == PM_FreeKick_Right
+         || catcher.isGoalie() == false )
     {
+        // ssim catch-glue: a non-goalie catch (dribble grab) registers the
+        // catcher so the per-cycle re-pin above keeps the ball with the player
+        // until it is kicked / tackled / dropped.
         M_ball_catcher = &catcher;
     }
 }
