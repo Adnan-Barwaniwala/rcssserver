@@ -1048,11 +1048,20 @@ Stadium::incMovableObjects()
     // move_caughat_ball() [2000.07.21: I.Noda]
     if ( M_ball_catcher )
     {
-        // keeps the caught ball infront of the player
-        PVector rpos = PVector::fromPolar( M_ball_catcher->size()
-                                           + ServerParam::instance().ballSize(),
-                                           M_ball_catcher->angleBodyCommitted() );
-        M_ball->moveTo( M_ball_catcher->pos() + rpos );
+        if ( ! M_ball_catcher->isEnabled() )
+        {
+            // ssim catch-glue: catcher disconnected/disabled mid-carry; stop
+            // pinning the ball to its stale off-field position.
+            clearBallCatcher();
+        }
+        else
+        {
+            // keeps the caught ball infront of the player
+            PVector rpos = PVector::fromPolar( M_ball_catcher->size()
+                                               + ServerParam::instance().ballSize(),
+                                               M_ball_catcher->angleBodyCommitted() );
+            M_ball->moveTo( M_ball_catcher->pos() + rpos );
+        }
     }
 }
 

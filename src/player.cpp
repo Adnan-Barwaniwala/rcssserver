@@ -466,8 +466,10 @@ Player::disable()
                   << ")\n";
     }
 
-    if ( isGoalie()
-         && this == M_stadium.ballCatcher() )
+    // ssim catch-glue: any catcher (goalie OR dribbling field player) must
+    // release the ball on disconnect, otherwise the per-cycle re-pin keeps
+    // yanking the ball to this now-disabled player's off-field position.
+    if ( this == M_stadium.ballCatcher() )
     {
         M_stadium.clearBallCatcher();
     }
@@ -1557,13 +1559,17 @@ Player::goalieCatch( double dir )
     //pfr: we should only be able to catch in PlayOn mode
     //tom: actually the goalie can catch the ball in any playmode, but
     //infringements should be awarded.  Maybe later.
-    // ssim catch-glue: non-goalies may catch (the dribble grab). Only goalies
-    // are subject to the catch-ban / play-mode restrictions below.
-    if ( this->isGoalie() &&
-         ( M_goalie_catch_ban > 0
-         || ( M_stadium.playmode() != PM_PlayOn
-              && ! Referee::isPenaltyShootOut( M_stadium.playmode() ) )
-         ))
+    // ssim catch-glue: non-goalies may catch (the dribble grab), but the
+    // play-mode restriction (PlayOn / penalty shoot-out only) applies to
+    // EVERYONE -- a field player must not grab the ball during dead-ball
+    // states (kickoff, free kicks, after-goal, etc.). Only the goalie is
+    // additionally subject to the catch-ban cooldown.
+    const bool wrong_playmode
+        = ( M_stadium.playmode() != PM_PlayOn
+            && ! Referee::isPenaltyShootOut( M_stadium.playmode() ) );
+
+    if ( wrong_playmode
+         || ( this->isGoalie() && M_goalie_catch_ban > 0 ) )
     {
         M_state |= CATCH_FAULT;
         return;
