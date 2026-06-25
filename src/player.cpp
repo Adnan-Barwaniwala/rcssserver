@@ -1691,17 +1691,24 @@ Player::goalieCatch( double dir )
 
     if ( success )
     {
-        PVector new_pos = M_stadium.ball().pos() - this->pos();
-        double mag = new_pos.r();
-        // I would much prefer to cache the message of the catch command
-        // to the end of the cycle and then do all the movements and
-        // playmode changes there, but I feel that would be too much of a
-        // depature from the current behaviour.
-        mag -= SP.ballSize() + M_player_type->playerSize();
-        new_pos.normalize( mag );
-        M_pos += new_pos;
-        M_angle_body = new_pos.th();
-        M_vel = PVector();
+        // Preserve stock goalkeeper catch correction, but do not teleport,
+        // rotate, or stop a field player when catch is used as the dribble
+        // grab. Real robots must finish their own approach/alignment; catch
+        // only establishes ownership for the catch-glue path below.
+        if ( this->isGoalie() )
+        {
+            PVector new_pos = M_stadium.ball().pos() - this->pos();
+            double mag = new_pos.r();
+            // I would much prefer to cache the message of the catch command
+            // to the end of the cycle and then do all the movements and
+            // playmode changes there, but I feel that would be too much of a
+            // departure from the current behaviour.
+            mag -= SP.ballSize() + M_player_type->playerSize();
+            new_pos.normalize( mag );
+            M_pos += new_pos;
+            M_angle_body = new_pos.th();
+            M_vel = PVector();
+        }
 
         M_stadium.ballCaught( *this );
     }
