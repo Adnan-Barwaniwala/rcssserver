@@ -153,8 +153,8 @@ const double ServerParam::BALL_DECAY = 0.94;
 const double ServerParam::BALL_RAND = 0.05;
 const double ServerParam::BALL_WEIGHT = 0.2;
 const double ServerParam::BALL_T_VEL = 0.001;
-const double ServerParam::BALL_SPEED_MAX = 3.0; // [12.0.0] 2.7 -> 3.0;
-const double ServerParam::BALL_ACCEL_MAX = 2.7;
+const double ServerParam::BALL_SPEED_MAX = 4.0; // real-robot cap: 4 m/s (1 unit/cycle = 1 m/s); covers kick + pass
+const double ServerParam::BALL_ACCEL_MAX = 4.0; // a single kick impulse cannot exceed the 4 m/s cap
 
 const double ServerParam::PLAYER_SIZE = 0.3;
 const double ServerParam::PLAYER_WIDGET_SIZE = 1.0;
@@ -196,7 +196,7 @@ const double ServerParam::VISIBLE_DISTANCE = 3.0;
 const double ServerParam::AUDIO_CUT_OFF_DIST = 50.0;
 
 const double ServerParam::DASHPOWERRATE = 0.006;
-const double ServerParam::KICKPOWERRATE = 0.027;
+const double ServerParam::KICKPOWERRATE = 0.04; // power 100 -> 4.0 accel = real-robot max kick of 4 m/s
 const double ServerParam::MAXPOWER = 100.0;
 const double ServerParam::MINPOWER = -100.0;
 
@@ -207,8 +207,8 @@ const double ServerParam::DIST_QSTEP = 0.1;
 const double ServerParam::LAND_QSTEP = 0.01;
 const double ServerParam::DIR_QSTEP = 0.1;
 
-const double ServerParam::MAXMOMENT = 180;
-const double ServerParam::MINMOMENT = -180;
+const double ServerParam::MAXMOMENT = 2.0;  // real-robot angular-velocity cap: 2 deg/cycle * 10 cycles/s = 20 deg/s
+const double ServerParam::MINMOMENT = -2.0;
 
 const double ServerParam::MAX_NECK_MOMENT = 180;
 const double ServerParam::MIN_NECK_MOMENT = -180;
