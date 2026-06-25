@@ -1343,10 +1343,22 @@ Player::kick( double power,
         return;
     }
 
-    if ( ! ballKickable() )
+    if ( ! ballKickableInFrontReceptionCone() )
     {
         M_state |= KICK_FAULT;
         M_stadium.failedKickTaken( *this );
+        // A kick attempt always relinquishes a dribble catch-glue, even when the
+        // ball is outside the front reception cone. The accepted-kick path clears
+        // the catcher via Stadium::kickTaken(); without the mirror here a
+        // cone-rejected kick leaves the ball glued while the Python command
+        // tracker treats any `kick` as a release, desyncing the two. That stale
+        // catcher then re-pins the held ball to the carrier on the next episode
+        // reset, tripping the ball_teleport guard and bricking every following
+        // episode (all 1-step). See docs/TRAINING.md teleport-brick analysis.
+        if ( this == M_stadium.ballCatcher() )
+        {
+            M_stadium.clearBallCatcher();
+        }
         return;
     }
 
@@ -2771,6 +2783,22 @@ bool
 Player::ballKickable() const
 {
     return pos().distance2( M_stadium.ball().pos() ) <= std::pow( kickableArea(), 2 );
+}
+
+bool
+Player::ballKickableInFrontReceptionCone() const
+{
+    if ( ! ballKickable() )
+    {
+        return false;
+    }
+
+    // Physical dribbler mouth/reception cone. The CAD angle for the outside of
+    // the ball radius is wider; the simulator checks ball center geometry, so
+    // use the measured center-angle cone of about 100 degrees total.
+    static constexpr double FRONT_RECEPTION_CENTER_ANGLE_DEG = 100.0;
+    return std::fabs( angleFromBody( M_stadium.ball() ) )
+        <= Deg2Rad( FRONT_RECEPTION_CENTER_ANGLE_DEG * 0.5 );
 }
 
 double
